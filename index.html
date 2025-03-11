@@ -330,13 +330,13 @@
         document.addEventListener('DOMContentLoaded', function() {
     // Configuración de la canción
     const songLyrics = [
-        "Voy a reír, voy a bailar",
+        "Voy a reír, voy a *", // Cambiado "bailar" por "*" para ocultar la palabra
         "Vivir mi vida la la la la",
-        "Voy a reír, voy a gozar",
+        "Voy a reír, voy a *", // Cambiado "gozar" por "*" para ocultar la palabra
         "Vivir mi vida la la la la",
         "",
         "A veces llega la lluvia",
-        "Para limpiar las heridas",
+        "Para limpiar * *", // Cambiado "las heridas" por "* *" para ocultar la palabra
         "A veces solo una gota",
         "Puede vencer la sequía",
         "",
@@ -392,15 +392,18 @@
             const words = line.split(' ');
             
             words.forEach((word, wordIndex) => {
-                // Comprobar si esta palabra es una palabra faltante
-                const isMissingWord = missingWords.find(mw => 
-                    mw.lineIndex === lineIndex && mw.wordIndex === wordIndex);
-                
-                if (isMissingWord) {
-                    const missingWordElement = document.createElement('span');
-                    missingWordElement.className = 'missing-word';
-                    missingWordElement.dataset.wordIndex = isMissingWord.index - 1;
-                    lineElement.appendChild(missingWordElement);
+                // Comprobar si esta palabra es un marcador de palabra faltante (*)
+                if (word === '*') {
+                    // Buscar qué palabra corresponde a esta posición
+                    const missingWordInfo = missingWords.find(mw => 
+                        mw.lineIndex === lineIndex && mw.wordIndex === wordIndex);
+                    
+                    if (missingWordInfo) {
+                        const missingWordElement = document.createElement('span');
+                        missingWordElement.className = 'missing-word';
+                        missingWordElement.dataset.wordIndex = missingWordInfo.index - 1;
+                        lineElement.appendChild(missingWordElement);
+                    }
                 } else {
                     const wordElement = document.createElement('span');
                     wordElement.className = 'word';
