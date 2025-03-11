@@ -325,270 +325,282 @@
         </div>
     </div>
 
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Configuración de la canción
-            const songLyrics = [
-                "Voy a reír, voy a bailar",
-                "Vivir mi vida la la la la",
-                "Voy a reír, voy a gozar",
-                "Vivir mi vida la la la la",
-                "",
-                "A veces llega la lluvia",
-                "Para limpiar las heridas",
-                "A veces solo una gota",
-                "Puede vencer la sequía",
-                "",
-                "Y para qué llorar, ¿para qué?",
-                "Si duele una pena, se olvida",
-                "Y para qué sufrir, ¿para qué?",
-                "Si así es la vida, hay que vivirla"
-            ];
+    // Configuración de la canción
+    const songLyrics = [
+        "Voy a reír, voy a bailar",
+        "Vivir mi vida la la la la",
+        "Voy a reír, voy a gozar",
+        "Vivir mi vida la la la la",
+        "",
+        "A veces llega la lluvia",
+        "Para limpiar las heridas",
+        "A veces solo una gota",
+        "Puede vencer la sequía",
+        "",
+        "Y para qué llorar, ¿para qué?",
+        "Si duele una pena, se olvida",
+        "Y para qué sufrir, ¿para qué?",
+        "Si así es la vida, hay que vivirla"
+    ];
 
-            // Palabras que se deben adivinar (en minúsculas)
-            const missingWords = [
-                { index: 1, lineIndex: 0, wordIndex: 3, word: "bailar" },
-                { index: 2, lineIndex: 2, wordIndex: 3, word: "gozar" },
-                { index: 3, lineIndex: 6, wordIndex: 2, word: "heridas" }
-            ];
+    // Palabras que se deben adivinar (en minúsculas)
+    const missingWords = [
+        { index: 1, lineIndex: 0, wordIndex: 3, word: "bailar" },
+        { index: 2, lineIndex: 2, wordIndex: 3, word: "gozar" },
+        { index: 3, lineIndex: 6, wordIndex: 2, word: "heridas" }
+    ];
 
-            // Variables de estado del juego
-            let currentWordIndex = 0;
-            let currentAttempts = 0;
-            const maxAttempts = 5;
-            let correctGuesses = 0;
-            let gameCompleted = false;
+    // Variables de estado del juego
+    let currentWordIndex = 0;
+    let currentAttempts = 0;
+    const maxAttempts = 5;
+    let correctGuesses = 0;
+    let gameCompleted = false;
 
-            // Elementos del DOM
-            const lyricsContainer = document.getElementById('lyrics');
-            const guessContainer = document.getElementById('guessContainer');
-            const guessForm = document.getElementById('guessForm');
-            const guessInput = document.getElementById('guessInput');
-            const guessButton = document.getElementById('guessButton');
-            const feedback = document.getElementById('feedback');
-            const attemptsContainer = document.getElementById('attemptsContainer');
-            const currentWordPrompt = document.getElementById('currentWordPrompt');
-            const resultContainer = document.getElementById('resultContainer');
-            const resultPercentage = document.getElementById('resultPercentage');
-            const restartButton = document.getElementById('restartButton');
+    // Elementos del DOM
+    const lyricsContainer = document.getElementById('lyrics');
+    const guessContainer = document.getElementById('guessContainer');
+    const guessForm = document.getElementById('guessForm');
+    const guessInput = document.getElementById('guessInput');
+    const guessButton = document.getElementById('guessButton');
+    const feedback = document.getElementById('feedback');
+    const attemptsContainer = document.getElementById('attemptsContainer');
+    const currentWordPrompt = document.getElementById('currentWordPrompt');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultPercentage = document.getElementById('resultPercentage');
+    const restartButton = document.getElementById('restartButton');
 
-            // Inicializar el juego
-            function initGame() {
-                // Limpiar el contenedor de letras
-                lyricsContainer.innerHTML = '';
-                
-                // Generar la letra de la canción con palabras faltantes
-                songLyrics.forEach((line, lineIndex) => {
-                    const lineElement = document.createElement('div');
-                    lineElement.className = 'lyric-line';
-                    
-                    // Si la línea está vacía, crear un espacio adicional
-                    if (line.trim() === '') {
-                        lyricsContainer.appendChild(lineElement);
-                        return;
-                    }
-                    
-                    const words = line.split(' ');
-                    
-                    words.forEach((word, wordIndex) => {
-                        // Comprobar si esta palabra es una palabra faltante
-                        const isMissingWord = missingWords.find(mw => 
-                            mw.lineIndex === lineIndex && mw.wordIndex === wordIndex);
-                        
-                        if (isMissingWord) {
-                            const missingWordElement = document.createElement('span');
-                            missingWordElement.className = 'missing-word';
-                            missingWordElement.dataset.wordIndex = isMissingWord.index - 1;
-                            lineElement.appendChild(missingWordElement);
-                        } else {
-                            const wordElement = document.createElement('span');
-                            wordElement.className = 'word';
-                            wordElement.textContent = word;
-                            lineElement.appendChild(wordElement);
-                        }
-                        
-                        // Añadir espacio después de cada palabra excepto la última
-                        if (wordIndex < words.length - 1) {
-                            lineElement.appendChild(document.createTextNode(' '));
-                        }
-                    });
-                    
-                    lyricsContainer.appendChild(lineElement);
-                });
-                
-                // Configurar el juego para la primera palabra
-                setupCurrentWord();
+    // Inicializar el juego
+    function initGame() {
+        // Limpiar el contenedor de letras
+        lyricsContainer.innerHTML = '';
+        
+        // Generar la letra de la canción con palabras faltantes
+        songLyrics.forEach((line, lineIndex) => {
+            const lineElement = document.createElement('div');
+            lineElement.className = 'lyric-line';
+            
+            // Si la línea está vacía, crear un espacio adicional
+            if (line.trim() === '') {
+                lyricsContainer.appendChild(lineElement);
+                return;
             }
-
-            // Configurar el juego para la palabra actual
-            function setupCurrentWord() {
-                if (currentWordIndex >= missingWords.length) {
-                    endGame();
-                    return;
-                }
+            
+            const words = line.split(' ');
+            
+            words.forEach((word, wordIndex) => {
+                // Comprobar si esta palabra es una palabra faltante
+                const isMissingWord = missingWords.find(mw => 
+                    mw.lineIndex === lineIndex && mw.wordIndex === wordIndex);
                 
-                const currentWord = missingWords[currentWordIndex];
-                currentWordPrompt.textContent = `Palabra #${currentWord.index}:`;
-                
-                // Limpiar intentos anteriores
-                attemptsContainer.innerHTML = '';
-                
-                // Restablecer intentos
-                currentAttempts = 0;
-                
-                // Limpiar feedback
-                feedback.textContent = '';
-                feedback.className = 'feedback';
-                
-                // Enfocar campo de entrada
-                guessInput.value = '';
-                guessInput.focus();
-            }
-
-            // Comprobar el intento del jugador
-            function checkGuess(guess) {
-                const currentWord = missingWords[currentWordIndex].word.toLowerCase();
-                guess = guess.toLowerCase();
-                
-                // Incrementar intentos
-                currentAttempts++;
-                
-                // Crear contenedor para este intento
-                const attemptElement = document.createElement('div');
-                attemptElement.className = 'attempt';
-                
-                // Validar cada letra
-                for (let i = 0; i < Math.max(guess.length, currentWord.length); i++) {
-                    const letterBox = document.createElement('div');
-                    letterBox.className = 'letter-box';
-                    
-                    if (i < guess.length) {
-                        letterBox.textContent = guess[i];
-                        
-                        // Comprobar si la letra es correcta
-                        if (i < currentWord.length) {
-                            if (guess[i] === currentWord[i]) {
-                                letterBox.classList.add('correct');
-                            } else if (currentWord.includes(guess[i])) {
-                                letterBox.classList.add('partial');
-                            } else {
-                                letterBox.classList.add('incorrect');
-                            }
-                        } else {
-                            letterBox.classList.add('incorrect');
-                        }
-                    } else {
-                        letterBox.textContent = '_';
-                        letterBox.classList.add('incorrect');
-                    }
-                    
-                    attemptElement.appendChild(letterBox);
-                }
-                
-                // Añadir el intento al contenedor
-                attemptsContainer.appendChild(attemptElement);
-                
-                // Comprobar si el intento es correcto
-                if (guess === currentWord) {
-                    // Mostrar feedback
-                    feedback.textContent = '¡Correcto! Has adivinado la palabra.';
-                    feedback.className = 'feedback success';
-                    
-                    // Actualizar la palabra faltante en la letra
-                    const wordElements = document.querySelectorAll('.missing-word');
-                    const wordElement = wordElements[currentWordIndex];
-                    wordElement.textContent = currentWord;
-                    wordElement.className = 'word-complete';
-                    wordElement.style.minWidth = 'auto';
-                    
-                    // Incrementar aciertos
-                    correctGuesses++;
-                    
-                    // Pasar a la siguiente palabra
-                    setTimeout(() => {
-                        currentWordIndex++;
-                        setupCurrentWord();
-                    }, 1500);
-                    
-                    return true;
-                } else if (currentAttempts >= maxAttempts) {
-                    // Mostrar feedback
-                    feedback.textContent = `Se te acabaron los intentos. La palabra correcta era: "${currentWord}".`;
-                    feedback.className = 'feedback error';
-                    
-                    // Actualizar la palabra faltante en la letra
-                    const wordElements = document.querySelectorAll('.missing-word');
-                    const wordElement = wordElements[currentWordIndex];
-                    wordElement.textContent = currentWord;
-                    wordElement.className = 'word-failed';
-                    wordElement.style.minWidth = 'auto';
-                    
-                    // Pasar a la siguiente palabra
-                    setTimeout(() => {
-                        currentWordIndex++;
-                        setupCurrentWord();
-                    }, 2000);
-                    
-                    return false;
+                if (isMissingWord) {
+                    const missingWordElement = document.createElement('span');
+                    missingWordElement.className = 'missing-word';
+                    missingWordElement.dataset.wordIndex = isMissingWord.index - 1;
+                    lineElement.appendChild(missingWordElement);
                 } else {
-                    // Mostrar feedback
-                    const remainingAttempts = maxAttempts - currentAttempts;
-                    feedback.textContent = `Intento incorrecto. Te quedan ${remainingAttempts} intento${remainingAttempts !== 1 ? 's' : ''}.`;
-                    feedback.className = 'feedback error';
-                    
-                    // Limpiar campo de entrada
-                    guessInput.value = '';
-                    guessInput.focus();
-                    
-                    return false;
+                    const wordElement = document.createElement('span');
+                    wordElement.className = 'word';
+                    wordElement.textContent = word;
+                    lineElement.appendChild(wordElement);
                 }
-            }
-
-            // Finalizar el juego y mostrar resultados
-            function endGame() {
-                guessContainer.style.display = 'none';
-                resultContainer.style.display = 'block';
                 
-                // Calcular porcentaje de aciertos
-                const percentage = Math.round((correctGuesses / missingWords.length) * 100);
-                resultPercentage.textContent = `${percentage}%`;
-                
-                // Guardar estado del juego
-                gameCompleted = true;
-            }
-
-            // Reiniciar el juego
-            function restartGame() {
-                // Restablecer variables
-                currentWordIndex = 0;
-                currentAttempts = 0;
-                correctGuesses = 0;
-                gameCompleted = false;
-                
-                // Restablecer UI
-                guessContainer.style.display = 'block';
-                resultContainer.style.display = 'none';
-                
-                // Inicializar juego
-                initGame();
-            }
-
-            // Event Listeners
-            guessForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const guess = guessInput.value.trim();
-                
-                if (guess.length === 0) return;
-                
-                checkGuess(guess);
+                // Añadir espacio después de cada palabra excepto la última
+                if (wordIndex < words.length - 1) {
+                    lineElement.appendChild(document.createTextNode(' '));
+                }
             });
             
-            restartButton.addEventListener('click', restartGame);
-            
-            // Iniciar el juego
-            initGame();
+            lyricsContainer.appendChild(lineElement);
         });
+        
+        // Configurar el juego para la primera palabra
+        setupCurrentWord();
+    }
+
+    // Configurar el juego para la palabra actual
+    function setupCurrentWord() {
+        if (currentWordIndex >= missingWords.length) {
+            endGame();
+            return;
+        }
+        
+        const currentWord = missingWords[currentWordIndex];
+        currentWordPrompt.textContent = `Palabra #${currentWord.index}:`;
+        
+        // Limpiar intentos anteriores
+        attemptsContainer.innerHTML = '';
+        
+        // Restablecer intentos
+        currentAttempts = 0;
+        
+        // Limpiar feedback
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+        
+        // Enfocar campo de entrada
+        guessInput.value = '';
+        guessInput.focus();
+    }
+
+    // Comprobar el intento del jugador
+    function checkGuess(guess) {
+        const currentWord = missingWords[currentWordIndex].word.toLowerCase();
+        guess = guess.toLowerCase();
+        
+        // Incrementar intentos
+        currentAttempts++;
+        
+        // Crear contenedor para este intento
+        const attemptElement = document.createElement('div');
+        attemptElement.className = 'attempt';
+        
+        // Validar cada letra
+        for (let i = 0; i < Math.max(guess.length, currentWord.length); i++) {
+            const letterBox = document.createElement('div');
+            letterBox.className = 'letter-box';
+            
+            if (i < guess.length) {
+                letterBox.textContent = guess[i];
+                
+                // Comprobar si la letra es correcta
+                if (i < currentWord.length) {
+                    if (guess[i] === currentWord[i]) {
+                        letterBox.classList.add('correct');
+                    } else if (currentWord.includes(guess[i])) {
+                        letterBox.classList.add('partial');
+                    } else {
+                        letterBox.classList.add('incorrect');
+                    }
+                } else {
+                    letterBox.classList.add('incorrect');
+                }
+            } else {
+                letterBox.textContent = '_';
+                letterBox.classList.add('incorrect');
+            }
+            
+            attemptElement.appendChild(letterBox);
+        }
+        
+        // Añadir el intento al contenedor
+        attemptsContainer.appendChild(attemptElement);
+        
+        // Comprobar si el intento es correcto
+        if (guess === currentWord) {
+            // Mostrar feedback
+            feedback.textContent = '¡Correcto! Has adivinado la palabra.';
+            feedback.className = 'feedback success';
+            
+            // Actualizar la palabra faltante en la letra
+            const wordElement = document.querySelector(`.missing-word[data-word-index="${currentWordIndex}"]`);
+            if (wordElement) {
+                // Reemplazar el espacio censurado con la palabra correcta
+                wordElement.textContent = currentWord;
+                wordElement.className = 'word-complete';
+                wordElement.style.minWidth = 'auto';
+                
+                // Eliminar el ::after pseudo-elemento que muestra la barra de carga
+                wordElement.style.position = 'static';
+            }
+            
+            // Incrementar aciertos
+            correctGuesses++;
+            
+            // Pasar a la siguiente palabra
+            setTimeout(() => {
+                currentWordIndex++;
+                setupCurrentWord();
+            }, 1500);
+            
+            return true;
+        } else if (currentAttempts >= maxAttempts) {
+            // Mostrar feedback
+            feedback.textContent = `Se te acabaron los intentos. La palabra correcta era: "${currentWord}".`;
+            feedback.className = 'feedback error';
+            
+            // Actualizar la palabra faltante en la letra
+            const wordElement = document.querySelector(`.missing-word[data-word-index="${currentWordIndex}"]`);
+            if (wordElement) {
+                // Reemplazar el espacio censurado con la palabra correcta
+                wordElement.textContent = currentWord;
+                wordElement.className = 'word-failed';
+                wordElement.style.minWidth = 'auto';
+                
+                // Eliminar el ::after pseudo-elemento que muestra la barra de carga
+                wordElement.style.position = 'static';
+            }
+            
+            // Pasar a la siguiente palabra
+            setTimeout(() => {
+                currentWordIndex++;
+                setupCurrentWord();
+            }, 2000);
+            
+            return false;
+        } else {
+            // Mostrar feedback
+            const remainingAttempts = maxAttempts - currentAttempts;
+            feedback.textContent = `Intento incorrecto. Te quedan ${remainingAttempts} intento${remainingAttempts !== 1 ? 's' : ''}.`;
+            feedback.className = 'feedback error';
+            
+            // Limpiar campo de entrada
+            guessInput.value = '';
+            guessInput.focus();
+            
+            return false;
+        }
+    }
+
+    // Finalizar el juego y mostrar resultados
+    function endGame() {
+        guessContainer.style.display = 'none';
+        resultContainer.style.display = 'block';
+        
+        // Calcular porcentaje de aciertos
+        const percentage = Math.round((correctGuesses / missingWords.length) * 100);
+        resultPercentage.textContent = `${percentage}%`;
+        
+        // Guardar estado del juego
+        gameCompleted = true;
+    }
+
+    // Reiniciar el juego
+    function restartGame() {
+        // Restablecer variables
+        currentWordIndex = 0;
+        currentAttempts = 0;
+        correctGuesses = 0;
+        gameCompleted = false;
+        
+        // Restablecer UI
+        guessContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
+        
+        // Inicializar juego
+        initGame();
+    }
+
+    // Event Listeners
+    guessForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const guess = guessInput.value.trim();
+        
+        if (guess.length === 0) return;
+        
+        checkGuess(guess);
+    });
+    
+    restartButton.addEventListener('click', restartGame);
+    
+    // Iniciar el juego
+    initGame();
+});
     </script>
+
 </body>
 </html>
