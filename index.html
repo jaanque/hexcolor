@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adivina el Color HEX</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+    
+    h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .color-display {
+      width: 100%;
+      height: 100px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .attempts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .attempt {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .char {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #d4d4d8;
+      border-radius: 4px;
+      font-size: 22px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+    
+    .char.green {
+      background-color: #4ade80;
+      color: white;
+      border-color: #4ade80;
+    }
+    
+    .char.yellow {
+      background-color: #eab308;
+      color: white;
+      border-color: #eab308;
+    }
+    
+    .char.gray {
+      background-color: #71717a;
+      color: white;
+      border-color: #71717a;
+    }
+    
+    .input-container {
+      margin-top: 20px;
+    }
+    
+    input {
+      padding: 12px;
+      font-size: 16px;
+      text-transform: uppercase;
+      width: 150px;
+      margin-right: 10px;
+      border: 2px solid #d4d6e0;
+      border-radius: 4px;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background-color: #4ade80;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: #22c55e;
+    }
+    
+    button:disabled {
+      background-color: #d4d4d8;
+      cursor: not-allowed;
+    }
+    
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+    
+    .win {
+      color: #4ade80;
+    }
+    
+    .lose {
+      color: #ef4444;
+    }
+    
+    .instructions {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .instructions p {
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    
+    .example {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .example-char {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      border-radius: 4px;
+    }
+    
+    .example-green {
+      background-color: #4ade80;
+    }
+    
+    .example-yellow {
+      background-color: #eab308;
+    }
+    
+    .example-gray {
+      background-color: #71717a;
+    }
+    
+    .instructions-toggle {
+      color: #4ade80;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    
+    .keyboard {
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    
+    .key {
+      width: 36px;
+      height: 40px;
+      margin: 0 2px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .key:hover {
+      background-color: #d1d5db;
+    }
+    
+    .key.wide {
+      width: 60px;
+    }
+    
+    .daily-note {
+      font-style: italic;
+      margin-top: 20px;
+      color: #6b7280;
+    }
+    
+    .privacy-note {
+      margin-top: 30px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <h1>Adivina el Color HEX</h1>
+  
+  <div class="instructions" id="instructions">
+    <p>Las reglas son simples: adivina el código de color HEX oculto en 6 intentos. Cada intento debe ser un código HEX válido de 6 caracteres (0-9, A-F).</p>
+    
+    <p>Después de cada intento el color de las casillas cambia para mostrar qué tan cerca estás de acertar el código:</p>
+    
+    <div class="example">
+      <div class="example-char example-green">A</div>
+      <div>VERDE significa que el carácter está en el código y en la posición CORRECTA.</div>
+    </div>
+    
+    <div class="example">
+      <div class="example-char example-yellow">B</div>
+      <div>AMARILLO significa que el carácter está presente en el código pero en la posición INCORRECTA.</div>
+    </div>
+    
+    <div class="example">
+      <div class="example-char example-gray">C</div>
+      <div>GRIS significa que el carácter NO está presente en el código.</div>
+    </div>
+    
+    <p>El color que se muestra arriba corresponde al código que debes adivinar. Intenta identificar el código basándote en tu percepción del color y los resultados de tus intentos.</p>
+  </div>
+  
+  <div class="instructions-toggle" id="toggleInstructions">Ocultar instrucciones</div>
+  
+  <div class="color-display" id="colorDisplay"></div>
+  
+  <div class="attempts" id="attempts"></div>
+  
+  <div class="input-container">
+    <input 
+      type="text" 
+      id="guessInput" 
+      maxlength="6" 
+      placeholder="Escribe un código HEX" 
+      pattern="[0-9A-Fa-f]{6}"
+    >
+    <button id="submitBtn">Enviar</button>
+    <button id="resetBtn" style="display: none;">Nuevo Juego</button>
+  </div>
+  
+  <div class="message" id="message"></div>
+  
+  <div class="daily-note">¡Un nuevo color para adivinar cada vez que juegas!</div>
+  
+  <div class="privacy-note">Al jugar estás aceptando nuestra política de privacidad.</div>
+  
+  <script>
+    // Elementos del DOM
+    const colorDisplay = document.getElementById('colorDisplay');
+    const attemptsContainer = document.getElementById('attempts');
+    const guessInput = document.getElementById('guessInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const messageElement = document.getElementById('message');
+    const toggleInstructions = document.getElementById('toggleInstructions');
+    const instructions = document.getElementById('instructions');
+    
+    // Variables del juego
+    let secretCode = '';
+    let attempts = 0;
+    const maxAttempts = 6;
+    let gameOver = false;
+    
+    // Toggle de instrucciones
+    toggleInstructions.addEventListener('click', () => {
+      if (instructions.style.display === 'none') {
+        instructions.style.display = 'block';
+        toggleInstructions.textContent = 'Ocultar instrucciones';
+      } else {
+        instructions.style.display = 'none';
+        toggleInstructions.textContent = 'Ver las instrucciones completas del juego';
+      }
+    });
+    
+    // Generar un código de color HEX aleatorio
+    function generateRandomHexCode() {
+      const characters = '0123456789ABCDEF';
+      let result = '';
+      for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    }
+    
+    // Iniciar el juego
+    function initGame() {
+      secretCode = generateRandomHexCode();
+      attempts = 0;
+      gameOver = false;
+      
+      // Actualizar el display de color
+      colorDisplay.style.backgroundColor = `#${secretCode}`;
+      
+      // Limpiar los intentos anteriores
+      attemptsContainer.innerHTML = '';
+      
+      // Añadir filas vacías para los intentos
+      for (let i = 0; i < maxAttempts; i++) {
+        const attemptRow = document.createElement('div');
+        attemptRow.classList.add('attempt');
+        
+        for (let j = 0; j < 6; j++) {
+          const charElement = document.createElement('div');
+          charElement.classList.add('char');
+          attemptRow.appendChild(charElement);
+        }
+        
+        attemptsContainer.appendChild(attemptRow);
+      }
+      
+      // Resetear input y mensajes
+      guessInput.value = '';
+      guessInput.disabled = false;
+      submitBtn.disabled = false;
+      submitBtn.style.display = 'inline-block';
+      resetBtn.style.display = 'none';
+      messageElement.textContent = '';
+      messageElement.className = 'message';
+      
+      // Mostrar instrucciones
+      instructions.style.display = 'block';
+      toggleInstructions.textContent = 'Ocultar instrucciones';
+    }
+    
+    // Validar el intento
+    function validateGuess(guess) {
+      // Convertir a mayúsculas para comparar
+      guess = guess.toUpperCase();
+      secretCode = secretCode.toUpperCase();
+      
+      const result = [];
+      const secretChars = secretCode.split('');
+      const guessChars = guess.split('');
+      
+      // Crear copia para marcar los caracteres ya utilizados
+      const secretCopy = [...secretChars];
+      
+      // Primero encontrar las posiciones correctas (verde)
+      for (let i = 0; i < 6; i++) {
+        if (guessChars[i] === secretChars[i]) {
+          result[i] = 'green';
+          secretCopy[i] = null; // Marcar como utilizado
+        } else {
+          result[i] = null;
+        }
+      }
+      
+      // Luego buscar caracteres correctos en posición incorrecta (amarillo)
+      for (let i = 0; i < 6; i++) {
+        if (result[i] === null) {
+          const charIndex = secretCopy.indexOf(guessChars[i]);
+          if (charIndex !== -1) {
+            result[i] = 'yellow';
+            secretCopy[charIndex] = null; // Marcar como utilizado
+          } else {
+            result[i] = 'gray';
+          }
+        }
+      }
+      
+      return result;
+    }
+    
+    // Actualizar el tablero con el resultado del intento
+    function updateBoard(guess, result) {
+      const attemptRow = attemptsContainer.children[attempts];
+      const chars = attemptRow.children;
+      
+      for (let i = 0; i < 6; i++) {
+        chars[i].textContent = guess[i].toUpperCase();
+        if (result[i]) {
+          chars[i].classList.add(result[i]);
+        }
+      }
+      
+      attempts++;
+    }
+    
+    // Comprobar si el juego ha terminado
+    function checkGameStatus(result) {
+      // Comprobar victoria
+      if (result.every(r => r === 'green')) {
+        endGame(true);
+        return true;
+      }
+      
+      // Comprobar derrota
+      if (attempts >= maxAttempts) {
+        endGame(false);
+        return true;
+      }
+      
+      return false;
+    }
+    
+    // Finalizar el juego
+    function endGame(isWin) {
+      gameOver = true;
+      guessInput.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.style.display = 'none';
+      resetBtn.style.display = 'inline-block';
+      
+      if (isWin) {
+        messageElement.textContent = '¡Felicidades! ¡Has adivinado el color!';
+        messageElement.classList.add('win');
+      } else {
+        messageElement.textContent = `Juego terminado. El código era #${secretCode}`;
+        messageElement.classList.add('lose');
+      }
+    }
+    
+    // Validar la entrada del usuario
+    function isValidHexCode(code) {
+      return /^[0-9A-Fa-f]{6}$/.test(code);
+    }
+    
+    // Event listeners
+    submitBtn.addEventListener('click', () => {
+      const guess = guessInput.value.trim();
+      
+      if (!isValidHexCode(guess)) {
+        messageElement.textContent = 'Por favor, introduce un código HEX válido (6 caracteres: 0-9, A-F)';
+        return;
+      }
+      
+      const result = validateGuess(guess);
+      updateBoard(guess, result);
+      guessInput.value = '';
+      
+      checkGameStatus(result);
+    });
+    
+    resetBtn.addEventListener('click', initGame);
+    
+    guessInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !submitBtn.disabled) {
+        submitBtn.click();
+      }
+    });
+    
+    // Iniciar el juego al cargar la página
+    initGame();
+  </script>
+</body>
+</html>
